@@ -85,30 +85,6 @@ namespace OPL2USB {
 			}
 		}
 
-		void send_thread2() {
-			while (true) {
-				dataexchange_t data;
-				data.size = 0;
-
-				std::unique_lock<std::mutex> lock(m);
-				while (q.empty()) {
-					c.wait(lock);
-				}
-
-				while (true)
-				{
-					data.commands[data.size] = q.front();
-					data.size += 1;
-					q.pop();
-
-					if (data.size == BUFF_SIZE || q.size() == 0)
-						break;
-				}
-
-				hid.SendData(&data);
-			}
-		}
-
 	private:
 		HIDLibrary<dataexchange_t> hid;
 		std::queue<command_t> q;

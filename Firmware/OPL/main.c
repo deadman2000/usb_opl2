@@ -31,11 +31,7 @@ struct dataexchange_t
 {
     uchar size;
     struct command_t commands[BUFF_SIZE];
-};
-
-
-struct dataexchange_t pdata;
-
+} pdata;
 
 PROGMEM const char usbHidReportDescriptor[] = { // USB report descriptor
     0x06, 0x00, 0xff,                       // USAGE_PAGE (Vendor Defined Page)
@@ -82,30 +78,22 @@ uchar usbFunctionWrite(uchar *data, uchar len)
     return bytesRemaining == 0;
 }
 
-extern void hadUsbReset(void) {
-    opl_reset();
-}
-
-/* ------------------------------------------------------------------------- */
-
 usbMsgLen_t usbFunctionSetup(uchar data[8])
 {
     usbRequest_t *rq = (void*)data;
 
     if ((rq->bmRequestType & USBRQ_TYPE_MASK) == USBRQ_TYPE_CLASS) {
-        if (rq->bRequest == USBRQ_HID_GET_REPORT){
-            bytesRemaining = sizeof(struct dataexchange_t);
-            currentAddress = 0;
-            return USB_NO_MSG;
-        } else if (rq->bRequest == USBRQ_HID_SET_REPORT) {
+        if (rq->bRequest == USBRQ_HID_SET_REPORT) {
             bytesRemaining = sizeof(struct dataexchange_t);
             currentAddress = 0;
             return USB_NO_MSG;
         }
-    } else {
-        /* no vendor specific requests implemented */
     }
     return 0;   /* default for not implemented requests: return no data back to host */
+}
+
+extern void hadUsbReset(void) {
+	opl_reset();
 }
 
 /* ------------------------------------------------------------------------- */
